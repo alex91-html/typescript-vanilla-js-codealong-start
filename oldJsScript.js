@@ -1,11 +1,3 @@
-"use strict";
-// enums 
-var FilterState;
-(function (FilterState) {
-  FilterState["All"] = "all";
-  FilterState["Active"] = "active";
-  FilterState["Completed"] = "completed";
-})(FilterState || (FilterState = {}));
 // DOM Elements
 const taskForm = document.getElementById('task-form');
 const taskInput = document.getElementById('task-input');
@@ -14,8 +6,10 @@ const tasksCount = document.getElementById('tasks-count');
 const filterAll = document.getElementById('filter-all');
 const filterActive = document.getElementById('filter-active');
 const filterCompleted = document.getElementById('filter-completed');
-// task array 
+
+// Task array
 let tasks = [];
+
 // Add task
 const addTask = (e) => {
   e.preventDefault();
@@ -31,37 +25,45 @@ const addTask = (e) => {
     taskInput.value = '';
   }
 };
+
 // Toggle task completion
 const toggleTask = (id) => {
-  tasks = tasks.map(task => task.id === id ? Object.assign(Object.assign({}, task), { completed: !task.completed }) : task);
+  tasks = tasks.map(task =>
+    task.id === id ? { ...task, completed: !task.completed } : task
+  );
   renderTasks();
 };
+
 // Delete task
 const deleteTask = (id) => {
   tasks = tasks.filter(task => task.id !== id);
   renderTasks();
 };
+
 // Render tasks
-const renderTasks = (filter = FilterState.All) => {
+const renderTasks = (filter = 'all') => {
   let filteredTasks = tasks;
-  if (filter === FilterState.Active) {
+  if (filter === 'active') {
     filteredTasks = tasks.filter(task => !task.completed);
-  }
-  else if (filter === FilterState.Completed) {
+  } else if (filter === 'completed') {
     filteredTasks = tasks.filter(task => task.completed);
   }
+
   taskList.innerHTML = filteredTasks.map(task => `
         <li class="${task.completed ? 'completed' : ''}">
             <span onclick="toggleTask(${task.id})">${task.text}</span>
             <button onclick="deleteTask(${task.id})">Delete</button>
         </li>
     `).join('');
+
   tasksCount.textContent = `${tasks.filter(task => !task.completed).length} tasks left`;
 };
+
 // Event listeners
 taskForm.addEventListener('submit', addTask);
-filterAll.addEventListener('click', () => renderTasks(FilterState.All));
-filterActive.addEventListener('click', () => renderTasks(FilterState.Active));
-filterCompleted.addEventListener('click', () => renderTasks(FilterState.Completed));
+filterAll.addEventListener('click', () => renderTasks('all'));
+filterActive.addEventListener('click', () => renderTasks('active'));
+filterCompleted.addEventListener('click', () => renderTasks('completed'));
+
 // Initial render
 renderTasks();
